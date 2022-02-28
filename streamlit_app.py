@@ -9,7 +9,7 @@ def load_data():
     '''
     Load the processed master data set
     '''
-    master_url = './datasets/wid-all/us-master.csv'
+    master_url = 'https://metashady.blob.core.windows.net/public/us-master.csv'
     return pd.read_csv(master_url)
 
 @st.cache # caching for faster access

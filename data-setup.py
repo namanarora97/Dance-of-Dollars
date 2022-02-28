@@ -33,6 +33,11 @@ us = us.merge(
     axis = 1
 )
 
+# Some cleanup
+us['shortname'] = us['shortname'].apply(
+    lambda x : x.strip()
+)
+
 print('Writing us-master.csv...')
 
 us.to_csv(path+'us-master.csv')

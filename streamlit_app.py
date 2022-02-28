@@ -92,6 +92,15 @@ if percentile_brush == 'p0p1':
 
 print(percentile_brush)
 
+year_brush = st.slider(
+    'Select a range of years to display',
+    1900, 
+    us.year.max(),
+    (1920, 2021)
+)
+
+# year_brush_a, year_brush_b = year_brush
+
 # Single percentile selected via drop down and trend seena across all years
 single_percentile_vs_years = alt.Chart(
     get_slice(
@@ -99,11 +108,13 @@ single_percentile_vs_years = alt.Chart(
         {'percentile' : percentile_brush}
     ),
 ).mark_bar(tooltip=True).encode(
-    alt.Y('value:Q'),
-    alt.X('year', scale = alt.Scale(zero=False)),
+    alt.Y('value:Q', title = 'Income'),
+    alt.X('year:O', scale = alt.Scale(zero=False)),
 ).interactive().properties(
     width=1000,
     height=500
+).transform_filter(
+    alt.FieldRangePredicate(field='year', range = list(year_brush))
 )
 
 st.write(single_percentile_vs_years)
@@ -111,4 +122,4 @@ st.write(single_percentile_vs_years)
 
 
 
-st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](ndf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")
+st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](mailtondf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")

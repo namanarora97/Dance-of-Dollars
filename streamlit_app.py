@@ -95,7 +95,7 @@ print(percentile_brush)
 year_brush = st.slider(
     'Select a range of years to display',
     1900, 
-    us.year.max(),
+    int(us.year.max()),
     (1920, 2021)
 )
 

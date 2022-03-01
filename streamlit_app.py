@@ -220,7 +220,7 @@ st.write('We wll be plotting the personal income tax to get an idea of the gover
 defense_df = get_slice_full(['mdefgo999i', 'mtiwho999i'])[['variable','year', 'value']]
 defense_df.value = defense_df.value.apply(lambda x : x/10**9)
 defense_df.variable = defense_df.variable.str.replace('mdefgo999i', 'Defence').replace('mtiwho999i', 'Personal_tax')
-def_chart = alt.Chart(defense_df, title='Strong and consistent defenses').mark_bar(opacity=0.7).encode(
+def_chart = alt.Chart(defense_df, title='Strong and consistent defenses').mark_bar(opacity=0.7, tooltip=True).encode(
     x = 'year:O',
     y = alt.Y('value:Q', stack=None, title = '$ Billion'),
     color = 'variable'

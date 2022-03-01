@@ -233,4 +233,4 @@ st.write('We can see that the defense spending has been on a steady rise ever si
 st.write('Even though the US economy sufferred, defenses did not go down.')
 st.altair_chart(def_chart, use_container_width=True)
 
-st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](mailtondf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")
+st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](mailto:ndf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")

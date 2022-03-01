@@ -1,3 +1,4 @@
+from re import U
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -211,5 +212,25 @@ st.write('We can notice an odd trend. Social Protection spending has continued t
 steadily regardless of the economic situation of the country\'s corporations.')
 st.write('We can also notice some major drops in corporate cash during periods of recession, the attacks of 9/11, etc.')
 st.write('It can also be noted that the growth of corporations over the past 10 years has been quite fast, while social spending has remained somewhat constant.')
+
+
+st.header('The US is known for its military and defense spending.')
+st.subheader('Let us see if the military spending has been impacted by any major occurences in history')
+st.write('We wll be plotting the personal income tax to get an idea of the government\'s inflow of cash')
+defense_df = get_slice_full(['mdefgo999i', 'mtiwho999i'])[['variable','year', 'value']]
+defense_df.value = defense_df.value.apply(lambda x : x/10**9)
+defense_df.variable = defense_df.variable.str.replace('mdefgo999i', 'Defence').replace('mtiwho999i', 'Personal_tax')
+def_chart = alt.Chart(defense_df, title='Strong and consistent defenses').mark_bar(opacity=0.7).encode(
+    x = 'year:O',
+    y = alt.Y('value:Q', stack=None, title = '$ Billion'),
+    color = 'variable'
+).interactive().properties(
+    width=1000,
+    height=500
+)
+
+st.write('We can see that the defense spending has been on a steady rise ever since 9/11')
+st.write('Even though the US economy sufferred, defenses did not go down.')
+st.altair_chart(def_chart, use_container_width=True)
 
 st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](mailtondf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")

@@ -3,8 +3,8 @@ import pandas as pd
 import altair as alt
 from pathlib import Path
 
+st.set_page_config(layout="wide")
 st.title("Where do the $$$ go?")
-
 @st.cache  # add caching so we load the data only once
 def load_data():
     '''
@@ -101,7 +101,11 @@ year_brush = st.slider(
 
 # year_brush_a, year_brush_b = year_brush
 
-# Single percentile selected via drop down and trend seena across all years
+single = alt.selection_single(encodings = ['x'])
+
+print(single)
+
+# Single percentile selected via drop down and trend seen across all years
 single_percentile_vs_years = alt.Chart(
     get_slice(
         'Pre-tax national income',
@@ -110,16 +114,79 @@ single_percentile_vs_years = alt.Chart(
 ).mark_bar(tooltip=True).encode(
     alt.Y('value:Q', title = 'Income'),
     alt.X('year:O', scale = alt.Scale(zero=False)),
-).interactive().properties(
+).properties(
     width=1000,
     height=500
 ).transform_filter(
-    alt.FieldRangePredicate(field='year', range = list(year_brush))
+    alt.FieldRangePredicate(field='year', range = list(year_brush)),
+).add_selection(
+    single
+).encode(
+    color=alt.condition(single, alt.value("steelblue"), alt.value("grey"))
 )
 
 st.write(single_percentile_vs_years)
 
+# t_df = get_slice('Pre-tax national income', {})
+
+# all_percentiles_single_year = alt.Chart(
+#     t_df[t_df.percentile.isin(percentiles)]
+# ).mark_bar(tooltip=True).encode(
+#     alt.Y('sum(value)', title = 'Income'),
+#     alt.X('percentile'),
+# ).properties(
+#     width=1000,
+#     height=500
+# )
+
+st.write('Has the distribution of wealth changed over time?')
+st.write('Use the slider underneath to visualize!')
+
+t_df = get_slice('Pre-tax national income', {})
+# Slider used to select a single year
+slider = alt.binding_range(min=1920, max=2021, step=1, name='year:')
+# Setting up a selector for the year using the value from slider 
+selector = alt.selection_single(name="SelectorName", fields=['year'],
+                                bind=slider, init={'year': 2020})
+
+# This chart changes with a slider that shows up underneath
+slider_change = alt.Chart(
+    t_df[(t_df['percentile'].isin(percentiles)) & (t_df.value>0)]
+).mark_bar(tooltip=True).encode(
+    alt.Y('sum(value):Q', title = 'Income', scale=alt.Scale(type='log')),
+    alt.X('percentile', sort=percentiles),
+).interactive().transform_filter(
+    alt.datum.year < selector.year
+).add_selection(
+    selector
+).properties(
+    width=1000,
+    height=500
+)
+
+st.write(slider_change)
+st.write('Note: This plot does not show unemployed individuals.')
+st.write('The gap between the rich and poor has only increased over the last several decades.')
+
+# st.write(single_percentile_vs_years \
+#     & all_percentiles_single_year.transform_filter(single))
+
+# st.altair_chart(
+#     single_percentile_vs_years \
+#     & all_percentiles_single_year.transform_filter(single),
+#     use_container_width=True
+# )
 
 
+# test=alt.Chart(
+#     t_df[t_df.percentile.isin(percentiles)]
+# ).mark_bar(tooltip=True).encode(
+#     alt.Y('sum(value)', title = 'Income'),
+#     alt.X('percentile'),
+# )
+
+# st.altair_chart(test)
+# st.write(all_percentiles_single_year)
+# print(alt.__version__)
 
 st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](mailtondf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")

@@ -5,6 +5,10 @@ from pathlib import Path
 
 st.set_page_config(layout="wide")
 st.title("Where do the $$$ go?")
+st.write(
+    'We are attempting to highlight the wealth inequality that has plagued the US for decades.\n' +
+    ''
+)
 @st.cache  # add caching so we load the data only once
 def load_data():
     '''
@@ -44,6 +48,11 @@ def get_slice(variable, dict=None):
     if dict != None:
         df = df.loc[(df[list(dict)] == pd.Series(dict)).all(axis=1)]
     return df
+    
+@st.cache
+def get_slice_full(variable):
+    df = us[us.variable.isin(variable)]
+    return df
 
 
 # Load the data
@@ -65,7 +74,7 @@ if st.checkbox('Show data sample'):
         st.write(us[min_range:max_range+1])
 
 
-st.write(
+st.header(
     'We know that income is not equally distributed. But how unequal is it, really?'
 )
 
@@ -125,21 +134,9 @@ single_percentile_vs_years = alt.Chart(
     color=alt.condition(single, alt.value("steelblue"), alt.value("grey"))
 )
 
-st.write(single_percentile_vs_years)
+st.altair_chart(single_percentile_vs_years, use_container_width=True)
 
-# t_df = get_slice('Pre-tax national income', {})
-
-# all_percentiles_single_year = alt.Chart(
-#     t_df[t_df.percentile.isin(percentiles)]
-# ).mark_bar(tooltip=True).encode(
-#     alt.Y('sum(value)', title = 'Income'),
-#     alt.X('percentile'),
-# ).properties(
-#     width=1000,
-#     height=500
-# )
-
-st.write('Has the distribution of wealth changed over time?')
+st.header('Has the distribution of wealth changed over time?')
 st.write('Use the slider underneath to visualize!')
 
 t_df = get_slice('Pre-tax national income', {})
@@ -164,17 +161,51 @@ slider_change = alt.Chart(
     height=500
 )
 
-st.write(slider_change)
+st.altair_chart(slider_change, use_container_width=True)
 st.write('Note: This plot does not show unemployed individuals.')
 st.write('The gap between the rich and poor has only increased over the last several decades.')
 
-# st.write(single_percentile_vs_years \
-#     & all_percentiles_single_year.transform_filter(single))
+st.write('')
+st.header('The corporations of US have seen some immense growth over the last 5 decades')
+st.subheader('What has this meant for the poor? - "The Trickle of Cash"')
 
-# st.altair_chart(
-#     single_percentile_vs_years \
-#     & all_percentiles_single_year.transform_filter(single),
-#     use_container_width=True
-# )
+benefits_and_corporate_earnings = get_slice_full(['mssbho999i', 'mcwboo999i'])
+benefits_vs_corporations = pd.pivot_table(
+    data = benefits_and_corporate_earnings,
+    values = 'value',
+    index = 'year',
+    columns = 'variable',
+    aggfunc='sum'
+).set_axis(['Book_value_of_corporations', 'Social_Benefits_Sanctioned'], axis=1)
+# Remove nulls
+benefits_vs_corporations = benefits_vs_corporations.loc[
+    ~benefits_vs_corporations.Social_Benefits_Sanctioned.isna()
+]
+# Change unit to $Trillion
+benefits_vs_corporations = benefits_vs_corporations.apply(
+    lambda x : x/10**12
+)
+
+social_corporate = alt.Chart(
+    benefits_vs_corporations.reset_index(),
+    title = 'The Trickle of Cash'
+).mark_circle(size = 100, opacity = 1, color='green').encode(
+    alt.X(
+        'Book_value_of_corporations', 
+        title = 'Book Value of US Corporations ($ Trillion)',
+        scale = alt.Scale(zero=False)
+    ),
+    alt.Y('Social_Benefits_Sanctioned', title = 'Social Benefits Spending ($ Trillion)'),
+    alt.Tooltip('year')
+).interactive().properties(
+    width=1000,
+    height=500
+)
+
+st.altair_chart(social_corporate, use_container_width=True)
+st.write('We can notice an odd trend. Social spending has continued to grow \
+steadily regardless of the economic situation of the country\'s corporations.')
+st.write('We can also notice some major drops in corporate cash during periods of recession, the attacks of 9/11, etc.')
+st.write('It can also be noted that the growth of corporations over the past 10 years has been quite fast, while social spending has remained somewhat constant.')
 
 st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](mailtondf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")

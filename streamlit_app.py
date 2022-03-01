@@ -177,16 +177,4 @@ st.write('The gap between the rich and poor has only increased over the last sev
 #     use_container_width=True
 # )
 
-
-# test=alt.Chart(
-#     t_df[t_df.percentile.isin(percentiles)]
-# ).mark_bar(tooltip=True).encode(
-#     alt.Y('sum(value)', title = 'Income'),
-#     alt.X('percentile'),
-# )
-
-# st.altair_chart(test)
-# st.write(all_percentiles_single_year)
-# print(alt.__version__)
-
 st.markdown("This project was created by [Naman](mailto:namanarora@cmu.edu) and [Nate](mailtondf@andrew.cmu.edu) for the [Interactive Data Science](https://dig.cmu.edu/ids2022) course at [Carnegie Mellon University](https://www.cmu.edu).")

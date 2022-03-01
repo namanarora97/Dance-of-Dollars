@@ -169,21 +169,25 @@ st.write('')
 st.header('The corporations of US have seen some immense growth over the last 5 decades')
 st.subheader('What has this meant for the poor? - "The Trickle of Cash"')
 
-benefits_and_corporate_earnings = get_slice_full(['mssbho999i', 'mcwboo999i'])
+benefits_and_corporate_earnings = get_slice_full(['msopgo999i', 'mcwboo999i'])
 benefits_vs_corporations = pd.pivot_table(
     data = benefits_and_corporate_earnings,
     values = 'value',
     index = 'year',
     columns = 'variable',
     aggfunc='sum'
-).set_axis(['Book_value_of_corporations', 'Social_Benefits_Sanctioned'], axis=1)
+).set_axis(['Book_value_of_corporations', 'Social_Protection'], axis=1)
 # Remove nulls
 benefits_vs_corporations = benefits_vs_corporations.loc[
-    ~benefits_vs_corporations.Social_Benefits_Sanctioned.isna()
+    ~benefits_vs_corporations.Social_Protection.isna()
 ]
 # Change unit to $Trillion
-benefits_vs_corporations = benefits_vs_corporations.apply(
+benefits_vs_corporations['Book_value_of_corporations'] = benefits_vs_corporations['Book_value_of_corporations'].apply(
     lambda x : x/10**12
+)
+# Unit to billion
+benefits_vs_corporations['Social_Protection'] = benefits_vs_corporations['Social_Protection'].apply(
+    lambda x : x/10**9
 )
 
 social_corporate = alt.Chart(
@@ -195,7 +199,7 @@ social_corporate = alt.Chart(
         title = 'Book Value of US Corporations ($ Trillion)',
         scale = alt.Scale(zero=False)
     ),
-    alt.Y('Social_Benefits_Sanctioned', title = 'Social Benefits Spending ($ Trillion)'),
+    alt.Y('Social_Protection', title = 'Social Protection Spending ($ Billion)'),
     alt.Tooltip('year')
 ).interactive().properties(
     width=1000,
@@ -203,7 +207,7 @@ social_corporate = alt.Chart(
 )
 
 st.altair_chart(social_corporate, use_container_width=True)
-st.write('We can notice an odd trend. Social spending has continued to grow \
+st.write('We can notice an odd trend. Social Protection spending has continued to grow \
 steadily regardless of the economic situation of the country\'s corporations.')
 st.write('We can also notice some major drops in corporate cash during periods of recession, the attacks of 9/11, etc.')
 st.write('It can also be noted that the growth of corporations over the past 10 years has been quite fast, while social spending has remained somewhat constant.')

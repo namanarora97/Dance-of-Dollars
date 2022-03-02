@@ -94,7 +94,7 @@ if st.checkbox('Show data sample'):
 
 st.subheader(
     '\"The day will come when our Republic will be an impossibility because wealth will be concentrated'
-    'in the hands of a few.\"'
+    ' in the hands of a few.\"'
 )
 
 st.subheader("Has that day arrived?")
@@ -186,11 +186,11 @@ slider_change = alt.Chart(
 )
 
 if percentile_brush == englishPercentiles[0]:
-    st.subheader('Question: What\' the income of the bottom 1%')
+    st.subheader('Question: What is the income of the bottom 1%')
     st.header('The chart is empty! The data is based on taxable income, and the bottom 1% are below the tax threshold.')
 else:
     st.altair_chart(single_percentile_vs_years & slider_change.transform_filter(alt.datum.year < single.year))
-    st.subheader('Question: What\' the income of the bottom 1%')
+    st.subheader('Question: What is the income of the bottom 1%')
 
 st.write('Note: This plot does not show unemployed individuals.')
 st.write('The gap between the rich and poor has only increased over the last several decades.')
@@ -247,7 +247,7 @@ st.write(
 
 st.subheader('\"A Republic cannot stand upon bayonets.\"')
 st.subheader('Let us see if the military spending has been impacted by any major occurrences in history')
-st.write('We wll be plotting the personal income tax to get an idea of the government\'s inflow of cash')
+st.write('We will be plotting the personal income tax to get an idea of the government\'s inflow of cash')
 defense_df = get_slice_full(['mdefgo999i', 'mtiwho999i'])[['variable', 'year', 'value']]
 defense_df.value = defense_df.value.apply(lambda x: x / 10 ** 9)
 defense_df.variable = defense_df.variable.str.replace('mdefgo999i', 'Defence').replace('mtiwho999i', 'Personal_tax')

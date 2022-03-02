@@ -5,10 +5,21 @@ import altair as alt
 from pathlib import Path
 
 st.set_page_config(layout="wide")
-st.title("Where do the $$$ go?")
+st.title("Where does the $$$ go?")
 st.write(
-    'We are attempting to highlight the wealth inequality that has plagued the US for decades.\n' +
-    ''
+    'These interactive displays highlight the growth of income inequality in the United States.\n'
+)
+st.write(
+    'They were inspired by the work of Dr. Thomas Piketty in his seminal work "Capital in the 21st Century"'
+)
+st.write(
+    'Another inspiration was the words of President James Madison that we use to frame our analysis:'
+)
+st.write(
+    'We are free today substantially but the day will come when our Republic will be an impossibility. It will be impossibility because wealth will be concentrated in the hands of a few. A republic cannot stand upon bayonets, and when that day comes, when the wealth of the nation will be in the hands of a few, then we must rely upon the wisdom of the best elements in the country to readjust the laws of the nation to the changed conditions.'
+)
+st.write(
+    'The data comes from the World Inequality Database and is available at https://wid.world/'
 )
 
 
@@ -19,8 +30,8 @@ def load_data():
     If the file is available locally, it is loaded. \n
     Else, the file is fetched from a self-hosted Azure blob
     '''
-    local_file = './datasets/wid-all/us-master.csv'
-    #local_file = r"datasets\wid-all\us-master.csv"
+    #local_file = './datasets/wid-all/us-master.csv'
+    local_file = r"datasets\wid-all\us-master.csv"
     my_file = Path(local_file)
     if my_file.is_file():
         master_url = local_file
@@ -80,13 +91,19 @@ if st.checkbox('Show data sample'):
         min_range, max_range = slice_index
         st.write(us[min_range:max_range + 1])
 
-st.header(
-    'We know that income is not equally distributed. But how unequal is it, really?'
+st.subheader(
+    '\"The day will come when our Republic will be an impossibility because wealth will be concentrated'
+    'in the hands of a few.\"'
 )
+
+st.subheader("Has that day arrived?")
 
 st.write(
     "Let's first look at how the income has changed for each individual section of the population\n" +
-    "This should give us a perspective into inflation, and overall growth of a country."
+    "This should give us a perspective into inflation, and the overall growth of a country."
+)
+st.write(
+    "You can select a year in the first chart to see all the income distributions in the second."
 )
 
 englishPercentiles = ["Bottom 1%", "Bottom 10%", "10-20th percentile", "20-30th percentile", "30-40th percentile",
@@ -98,25 +115,20 @@ englishPercentiles = ["Bottom 1%", "Bottom 10%", "10-20th percentile", "20-30th 
 #     ['p' + str(i) for i in range(10, 101, 10)]
 # )] + ['p99.9p100']
 
-percentiles = ['p0p1'] + [i + j for i, j in zip(
-    ['p' + str(i) for i in range(0, 100, 10)],
-    ['p' + str(i) for i in range(10, 101, 10)]
-)] + ['p99.9p100']
+percentiles = ['0-1th'] + [i + j for i, j in zip(
+    [str(i) for i in range(0, 100, 10)],
+    ['-' + str(i) + 'th' for i in range(10, 101, 10)]
+)] + ['99.9-100th']
 
 englishToPercentileDict = dict(zip(englishPercentiles, percentiles))
 
 percentileToEnglishDict = dict(zip(percentiles, englishPercentiles))
 
 percentile_brush = st.select_slider(
-    'Select a percentile you want to explore\n (ie the 99th percentile earn more than 99% of Americans)',
-    englishPercentiles,
-    #index=1
+    'Select a percentile you want to explore!',
+    englishPercentiles, 'Top 1%'
+
 )
-
-st.write('Tip: Try selecting the lowest percentile')
-
-if percentile_brush == englishPercentiles[0]:
-    st.write('The chart is empty! The lowest 1% have been living in poverty/unemployment for a while now.')
 
 print(percentile_brush)
 
@@ -124,7 +136,7 @@ year_brush = st.slider(
     'Select a range of years to display',
     1900,
     int(us.year.max()),
-    (1920, 2021)
+    (1970, 2021)
 )
 
 # year_brush_a, year_brush_b = year_brush
@@ -143,8 +155,8 @@ single_percentile_vs_years = alt.Chart(
     alt.Y('value:Q', title='Income'),
     alt.X('year:O', scale=alt.Scale(zero=False)),
 ).properties(
-    width=1000,
-    height=500
+    width=800,
+    height=400
 ).transform_filter(
     alt.FieldRangePredicate(field='year', range=list(year_brush)),
 ).add_selection(
@@ -153,10 +165,6 @@ single_percentile_vs_years = alt.Chart(
     color=alt.condition(single, alt.value("steelblue"), alt.value("grey"))
 )
 
-st.altair_chart(single_percentile_vs_years, use_container_width=True)
-
-st.header('Has the distribution of wealth changed over time?')
-st.write('Use the slider underneath to visualize!')
 
 t_df = get_slice('Pre-tax national income', {})
 # Slider used to select a single year
@@ -169,22 +177,28 @@ selector = alt.selection_single(name="SelectorName", fields=['year'],
 slider_change = alt.Chart(
     t_df[(t_df['percentile'].isin(percentiles)) & (t_df.value > 0)]
 ).mark_bar(tooltip=True).encode(
-    alt.Y('sum(value):Q', title='Income', scale=alt.Scale(type='log')),
-    alt.X('percentile', sort=percentiles),
+    alt.Y('mean(value):Q', title='Income', scale=alt.Scale(type='log')),
+    alt.X('percentile', sort=percentiles, title="Income Percentile", axis=alt.Axis(labelAngle=0)),
 ).properties(
-    width=1000,
+    width=800,
     height=500
 )
 
+if percentile_brush == englishPercentiles[0]:
+    st.subheader('Question: What\' the income of the bottom 1%')
+    st.header('The chart is empty! The data is based on taxable income, and the bottom 1% are below the tax threshold.')
+else:
+    st.altair_chart(single_percentile_vs_years & slider_change.transform_filter(alt.datum.year < single.year))
+    st.subheader('Question: What\' the income of the bottom 1%')
 
-
-st.altair_chart(single_percentile_vs_years & slider_change.transform_filter(alt.datum.year < single.year), use_container_width=True)
 st.write('Note: This plot does not show unemployed individuals.')
 st.write('The gap between the rich and poor has only increased over the last several decades.')
 
 st.write('')
-st.header('The corporations of US have seen some immense growth over the last 5 decades')
-st.subheader('What has this meant for the poor? - "The Trickle of Cash"')
+st.subheader("\"The wealth of the nation will be in the hands of a few, then we must rely upon the wisdom of the best elements in the country to readjust the laws of the nation to the changed conditions\"")
+st.write('The corporations of US have seen some immense growth over the last 5 decades')
+st.write('Have we readjusted laws for the social good? ')
+st.subheader('What has this meant for the poor?')
 
 benefits_and_corporate_earnings = get_slice_full(['msopgo999i', 'mcwboo999i'])
 benefits_vs_corporations = pd.pivot_table(
@@ -230,8 +244,8 @@ st.write('We can also notice some major drops in corporate cash during periods o
 st.write(
     'It can also be noted that the growth of corporations over the past 10 years has been quite fast, while social spending has remained somewhat constant.')
 
-st.header('The US is known for its military and defense spending.')
-st.subheader('Let us see if the military spending has been impacted by any major occurences in history')
+st.subheader('\"A Republic cannot stand upon bayonets.\"')
+st.subheader('Let us see if the military spending has been impacted by any major occurrences in history')
 st.write('We wll be plotting the personal income tax to get an idea of the government\'s inflow of cash')
 defense_df = get_slice_full(['mdefgo999i', 'mtiwho999i'])[['variable', 'year', 'value']]
 defense_df.value = defense_df.value.apply(lambda x: x / 10 ** 9)
@@ -246,7 +260,7 @@ def_chart = alt.Chart(defense_df, title='Strong and consistent defenses').mark_b
 )
 
 st.write('We can see that the defense spending has been on a steady rise ever since 9/11')
-st.write('Even though the US economy sufferred, defenses did not go down.')
+st.write('Even though the US economy suffered, defenses did not go down.')
 st.altair_chart(def_chart, use_container_width=True)
 
 st.markdown(

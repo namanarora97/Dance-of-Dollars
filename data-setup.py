@@ -3,13 +3,13 @@ path = './datasets/wid-all/'
 
 print('Reading US data...')
 
-us = pd.read_csv(r"datasets\wid-all\WID_data_US.csv", sep = ';')
+us = pd.read_csv(path+'WID_data_US.csv', sep = ';')
 
 print('Done reading US data')
 print('Reading US metadata...')
 
 us_meta = pd.read_csv(
-    r"datasets\wid-all\WID_metadata_US.csv",
+    path+'WID_metadata_US.csv', 
     sep = ';',
     encoding='ISO-8859-1'
 )
@@ -25,7 +25,7 @@ print('Merging...')
 
 us = us.merge(
     us_meta[['variable', 'shortname', 'shortage', 'simpledes',
-                'shorttype', 'shortpop', 'unit']],
+             'shorttype', 'shortpop', 'unit']],
     on = 'variable',
     how = 'inner'
 ).drop(
@@ -38,10 +38,10 @@ us['shortname'] = us['shortname'].apply(
     lambda x : x.strip()
 )
 
-print('Writing us-master.csv...')
-
 us['percentile'] = us.percentile.str.replace("p", "-").str.slice(1, ) + "th"
 
-us.to_csv(r"datasets\wid-all\us-master.csv")
+print('Writing us-master.csv...')
+
+us.to_csv(path+'us-master.csv')
 
 print('Done')

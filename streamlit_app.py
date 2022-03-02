@@ -178,7 +178,7 @@ selector = alt.selection_single(name="SelectorName", fields=['year'],
 slider_change = alt.Chart(
     t_df[(t_df['percentile'].isin(percentiles)) & (t_df.value > 0)]
 ).mark_bar(tooltip=True).encode(
-    alt.Y('mean(value):Q', title='Income'),#, scale=alt.Scale(type='log')),
+    alt.Y('mean(value):Q', title='Income'), scale=alt.Scale(type='log')),
     alt.X('percentile', sort=percentiles, title="Income Percentile", axis=alt.Axis(labelAngle=0)),
 ).properties(
     width=800,

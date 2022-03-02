@@ -37,8 +37,9 @@ def load_data():
         master_url = local_file
     else:
         master_url = 'https://metashady.blob.core.windows.net/public/us-master.csv'
-    return pd.read_csv(master_url)
-
+    us = pd.read_csv(master_url)
+    us['percentile'] = us.percentile.str.replace("p", "-").str.slice(1, ) + "th"
+    return us
 
 @st.cache  # caching for faster access
 def load_meta():

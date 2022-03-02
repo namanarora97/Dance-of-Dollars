@@ -16,7 +16,7 @@ st.write(
     'Another inspiration was the words of President James Madison that we use to frame our analysis:'
 )
 st.write(
-    'We are free today substantially but the day will come when our Republic will be an impossibility. It will be impossibility because wealth will be concentrated in the hands of a few. A republic cannot stand upon bayonets, and when that day comes, when the wealth of the nation will be in the hands of a few, then we must rely upon the wisdom of the best elements in the country to readjust the laws of the nation to the changed conditions.'
+    '\"We are free today substantially but the day will come when our Republic will be an impossibility. It will be impossibility because wealth will be concentrated in the hands of a few. A republic cannot stand upon bayonets, and when that day comes, when the wealth of the nation will be in the hands of a few, then we must rely upon the wisdom of the best elements in the country to readjust the laws of the nation to the changed conditions.\"'
 )
 st.write(
     'The data comes from the World Inequality Database and is available at https://wid.world/'
@@ -30,8 +30,8 @@ def load_data():
     If the file is available locally, it is loaded. \n
     Else, the file is fetched from a self-hosted Azure blob
     '''
-    #local_file = './datasets/wid-all/us-master.csv'
-    local_file = r"datasets\wid-all\us-master.csv"
+    local_file = './datasets/wid-all/us-master.csv'
+    #local_file = r"datasets\wid-all\us-master.csv"
     my_file = Path(local_file)
     if my_file.is_file():
         master_url = local_file

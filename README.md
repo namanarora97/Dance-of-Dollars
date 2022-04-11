@@ -1,7 +1,4 @@
-# CMU Interactive Data Science Assigment 2
-
-* **Team members**: [Naman](mailto:namana@andrew.cmu.edu) and [Nate](mailto:ndf@andrew.cmu.edu) 
-* **Online URL**: https://share.streamlit.io/cmu-ids-2022/assignment-2-team42/master/streamlit_app.py 
+[Access app on StreamLit](https://share.streamlit.io/cmu-ids-2022/assignment-2-team42/master/streamlit_app.py)
 
 # Where does the $$$ go?
 
